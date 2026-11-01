@@ -2,6 +2,7 @@ package com.example.healthbridge.api;
 
 import android.content.Context;
 
+import com.example.healthbridge.BuildConfig;
 import com.example.healthbridge.utils.SessionManager;
 
 import java.io.IOException;
@@ -16,19 +17,20 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Singleton Retrofit client configured for Supabase REST and GoTrue Auth APIs.
+ * Pulls credentials from BuildConfig (populated via local.properties).
  * Automatically injects the user's Supabase JWT access token when logged in,
  * and falls back to the publishable anon key.
  */
 public class SupabaseClient {
 
-    public static final String SUPABASE_URL = "https://awegpsbewzbzazsrrnbr.supabase.co";
-    private static final String BASE_REST_URL = "https://awegpsbewzbzazsrrnbr.supabase.co/rest/v1/";
-    private static final String BASE_AUTH_URL = "https://awegpsbewzbzazsrrnbr.supabase.co/auth/v1/";
-    private static final String SUPABASE_KEY = "sb_publishable_yaAm59lZzOYZahj0y_NRYw_3z8PSKL6";
+    public static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
+    private static final String BASE_REST_URL = BuildConfig.SUPABASE_URL + "/rest/v1/";
+    private static final String BASE_AUTH_URL = BuildConfig.SUPABASE_URL + "/auth/v1/";
+    private static final String SUPABASE_KEY = BuildConfig.SUPABASE_KEY;
 
     // Storage URLs for document vault
-    public static final String STORAGE_URL = "https://awegpsbewzbzazsrrnbr.supabase.co/storage/v1/object/";
-    public static final String STORAGE_PUBLIC_URL = "https://awegpsbewzbzazsrrnbr.supabase.co/storage/v1/object/public/";
+    public static final String STORAGE_URL = BuildConfig.SUPABASE_URL + "/storage/v1/object/";
+    public static final String STORAGE_PUBLIC_URL = BuildConfig.SUPABASE_URL + "/storage/v1/object/public/";
     public static final String BUCKET_NAME = "healthbridge-files";
 
     private static Context appContext = null;

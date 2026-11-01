@@ -1,0 +1,7 @@
+## Template for local.properties
+## Copy this file to local.properties and fill in your actual paths and keys.
+## DO NOT commit local.properties to git.
+sdk.dir=/path/to/Android/Sdk
+supabase.url=https://your-project-ref.supabase.co
+supabase.key=your-anon-publishable-key
+

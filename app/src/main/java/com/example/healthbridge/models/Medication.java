@@ -22,13 +22,21 @@ public class Medication {
     @SerializedName("frequency")
     private String frequency;
 
+    @SerializedName("start_date")
+    private String startDate;
+
+    @SerializedName("status")
+    private String status;
+
     public Medication() {}
 
-    public Medication(int profileId, String name, String dosage, String frequency) {
+    public Medication(int profileId, String name, String dosage, String frequency, String startDate, String status) {
         this.profileId = profileId;
         this.name = name;
         this.dosage = dosage;
         this.frequency = frequency;
+        this.startDate = startDate;
+        this.status = status;
     }
 
     // Getters
@@ -37,6 +45,8 @@ public class Medication {
     public String getName() { return name; }
     public String getDosage() { return dosage; }
     public String getFrequency() { return frequency; }
+    public String getStartDate() { return startDate; }
+    public String getStatus() { return status; }
 
     // Setters
     public void setId(int id) { this.id = id; }
@@ -44,4 +54,6 @@ public class Medication {
     public void setName(String name) { this.name = name; }
     public void setDosage(String dosage) { this.dosage = dosage; }
     public void setFrequency(String frequency) { this.frequency = frequency; }
+    public void setStartDate(String startDate) { this.startDate = startDate; }
+    public void setStatus(String status) { this.status = status; }
 }

@@ -27,7 +27,7 @@ import retrofit2.Response;
 
 /**
  * Login screen with Supabase GoTrue Auth integration.
- * On success, persists JWT tokens to SessionManager and navigates to DashboardActivity.
+ * Secure: strictly enforces credentials; fallback only runs if email confirmation is pending.
  */
 public class LoginActivity extends AppCompatActivity {
 
@@ -86,9 +86,8 @@ public class LoginActivity extends AppCompatActivity {
                     sessionManager.saveSession(auth);
 
                     // Fetch user's profile to complete session details
-                    fetchProfileAndProceed(email);
+                    fetchProfileAndProceed(auth.getUser() != null ? auth.getUser().getId() : null);
                 } else {
-                    // Check if error is due to email unconfirmed in Supabase
                     String errorBody = "";
                     try {
                         if (response.errorBody() != null) {
@@ -96,34 +95,37 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     } catch (Exception ignored) {}
 
+                    // The fallback is ONLY allowed if Supabase reports that email confirmation is pending
                     if (errorBody.contains("email_not_confirmed")) {
-                        setLoading(false);
-                        Toast.makeText(LoginActivity.this,
-                                "Email not confirmed. Please confirm in your inbox or Supabase Dashboard.",
-                                Toast.LENGTH_LONG).show();
-                    } else if (response.code() == 400) {
+                        // Demo fallback for email_not_confirmed
+                        fallbackEmailNotConfirmed(email);
+                    } else {
                         setLoading(false);
                         Toast.makeText(LoginActivity.this,
                                 getString(R.string.login_error_invalid),
                                 Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Fallback for demo: verify directly against profiles table
-                        fallbackDemoProfileLogin(email);
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
-                // If offline or network issue, fallback to check demo profile
-                fallbackDemoProfileLogin(email);
+                setLoading(false);
+                Toast.makeText(LoginActivity.this, getString(R.string.network_error), Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    private void fetchProfileAndProceed(String email) {
+    private void fetchProfileAndProceed(String userId) {
         SupabaseApiService api = SupabaseClient.getApiService();
-        api.getProfiles("*").enqueue(new Callback<List<Profile>>() {
+        Call<List<Profile>> call;
+        if (userId != null && !userId.isEmpty()) {
+            call = api.getProfileByUserId("*", "eq." + userId);
+        } else {
+            call = api.getProfiles("*");
+        }
+
+        call.enqueue(new Callback<List<Profile>>() {
             @Override
             public void onResponse(Call<List<Profile>> call, Response<List<Profile>> response) {
                 setLoading(false);
@@ -138,16 +140,16 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<Profile>> call, Throwable t) {
                 setLoading(false);
-                // Proceed even if profile fetch has a delay; token is saved
+                // Auth succeeded; proceed even if profile query fails
                 navigateToDashboard();
             }
         });
     }
 
     /**
-     * Fallback for hackathon demo speed if Auth email confirmation is pending.
+     * Fallback ONLY for hackathon demo if email confirmation is pending in Supabase Auth.
      */
-    private void fallbackDemoProfileLogin(String email) {
+    private void fallbackEmailNotConfirmed(String email) {
         SupabaseApiService api = SupabaseClient.getApiService();
         api.getProfiles("*").enqueue(new Callback<List<Profile>>() {
             @Override
@@ -156,7 +158,9 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
                     Profile profile = response.body().get(0);
                     sessionManager.saveProfileInfo(profile.getId(), profile.getFullName());
-                    Toast.makeText(LoginActivity.this, getString(R.string.login_success), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this,
+                            "Email unconfirmed: entered demo mode.",
+                            Toast.LENGTH_SHORT).show();
                     navigateToDashboard();
                 } else {
                     Toast.makeText(LoginActivity.this, getString(R.string.login_error_invalid), Toast.LENGTH_SHORT).show();

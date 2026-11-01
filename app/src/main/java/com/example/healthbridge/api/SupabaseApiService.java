@@ -30,14 +30,20 @@ public interface SupabaseApiService {
     @GET("profiles")
     Call<List<Profile>> getProfileById(
             @Query("select") String select,
-            @Query("id") String idFilter  // e.g. "eq.1"
+            @Query("id") String idFilter // e.g. "eq.1"
+    );
+
+    @GET("profiles")
+    Call<List<Profile>> getProfileByUserId(
+            @Query("select") String select,
+            @Query("user_id") String userIdFilter // e.g. "eq.105e12f7-..."
     );
 
     // ── Medical Records ───────────────────────────────────────
     @GET("medical_records")
     Call<List<MedicalRecord>> getMedicalRecords(
             @Query("select") String select,
-            @Query("profile_id") String profileIdFilter  // e.g. "eq.1"
+            @Query("profile_id") String profileIdFilter // e.g. "eq.1"
     );
 
     @POST("medical_records")
