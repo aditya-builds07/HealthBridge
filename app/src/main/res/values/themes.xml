@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.HealthBridge" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/hb_teal_primary</item>
+        <item name="colorPrimaryDark">@color/hb_teal_dark</item>
+        <item name="colorAccent">@color/hb_teal_primary</item>
+        <item name="android:statusBarColor">@color/hb_teal_deep</item>
+        <item name="android:navigationBarColor">@color/hb_teal_deep</item>
+        <item name="android:windowBackground">@color/hb_card_solid</item>
+    </style>
+</resources>

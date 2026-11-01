@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand and surfaces -->
+    <color name="hb_teal_primary">#00897B</color>
+    <color name="hb_teal_dark">#00695C</color>
+    <color name="hb_teal_deep">#004D40</color>
+    <color name="hb_bg_top">#7FA9A5</color>
+    <color name="hb_bg_bottom">#3F7F7B</color>
+    <color name="hb_glass_fill">#B3FFFFFF</color>
+    <color name="hb_glass_stroke">#80FFFFFF</color>
+    <color name="hb_card_solid">#F4FAF9</color>
+    <color name="hb_text_on_dark">#FFFFFF</color>
+    <color name="hb_text_primary">#1F2D2B</color>
+    <color name="hb_text_secondary">#5C6F6C</color>
+
+    <!-- Emergency -->
+    <color name="hb_emergency_red">#D32F2F</color>
+    <color name="hb_emergency_red_dark">#B71C1C</color>
+    <color name="hb_on_emergency">#FFFFFF</color>
+
+    <!-- Document category tints -->
+    <color name="hb_cat_prescription_bg">#DDF3E8</color>
+    <color name="hb_cat_prescription_text">#2E9E6B</color>
+    <color name="hb_cat_lab_bg">#DCEBFA</color>
+    <color name="hb_cat_lab_text">#2F7BD1</color>
+    <color name="hb_cat_xray_bg">#E6E1F7</color>
+    <color name="hb_cat_xray_text">#6A4FD0</color>
+    <color name="hb_cat_history_bg">#FBE0DE</color>
+    <color name="hb_cat_history_text">#D9534F</color>
+    <color name="hb_cat_pdf_bg">#FDE3E1</color>
+    <color name="hb_cat_pdf_text">#E53935</color>
+
+    <!-- BMI badge colors -->
+    <color name="hb_bmi_underweight">#1E88E5</color>
+    <color name="hb_bmi_normal">#43A047</color>
+    <color name="hb_bmi_overweight">#FB8C00</color>
+    <color name="hb_bmi_obese">#E53935</color>
+    <color name="hb_bmi_na">#9E9E9E</color>
+
+    <!-- Launcher icon background -->
+    <color name="ic_launcher_background">#FFFFFF</color>
+</resources>

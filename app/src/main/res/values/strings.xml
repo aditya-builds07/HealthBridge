@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Health Bridge</string>
+
+    <!-- Login -->
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">Sign in to access your health vault</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_login">Login</string>
+    <string name="login_error_empty">Please enter email and password</string>
+    <string name="login_error_invalid">Invalid credentials. Try again.</string>
+    <string name="login_success">Login successful</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_greeting">Hello, %1$s</string>
+    <string name="emergency_title">Emergency Info</string>
+    <string name="blood_group_label">Blood Group</string>
+    <string name="allergies_label">Allergies</string>
+    <string name="emergency_contact_label">Emergency Contact</string>
+    <string name="not_provided">Not provided</string>
+    <string name="btn_sos">SOS Call</string>
+    <string name="btn_hospitals">Nearby Hospitals</string>
+    <string name="bmi_label">BMI</string>
+    <string name="bmi_na">N/A</string>
+    <string name="btn_vault">My Medical Vault</string>
+    <string name="btn_generate_pdf">Generate Doctor PDF</string>
+    <string name="btn_share_qr">Share via QR Code</string>
+    <string name="sos_no_number">No emergency contact number available</string>
+
+    <!-- Vault -->
+    <string name="vault_title">Medical Vault</string>
+    <string name="search_hint">Search documents…</string>
+    <string name="chip_all">All</string>
+    <string name="chip_prescription">Prescription</string>
+    <string name="chip_lab_report">Lab Report</string>
+    <string name="chip_xray">X-Ray</string>
+    <string name="chip_summary">Summary</string>
+    <string name="upload_success">File uploaded successfully</string>
+    <string name="upload_failed">Upload failed. Check your internet and try again.</string>
+    <string name="file_too_large">File exceeds 10 MB limit</string>
+    <string name="no_documents">No documents yet</string>
+
+    <!-- General -->
+    <string name="loading">Loading…</string>
+    <string name="network_error">Network error. Please check your connection.</string>
+    <string name="retry">Retry</string>
+</resources>
