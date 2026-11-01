@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_dashboard.xml
+    Owner: Sonali
+    Design: Follows design.md – teal gradient background, glass cards, emergency crimson card.
+
+    INTEGRATION NOTE: This layout references drawables and colors that Aditya will
+    create in shared resources. Until those land on main, Android Studio will show
+    "resource not found" warnings for:
+        @drawable/bg_gradient
+        @drawable/bg_glass_card
+        @drawable/bg_emergency_card
+        @drawable/bg_button_primary
+        @color/hb_teal_primary, @color/hb_teal_dark, @color/hb_text_on_dark,
+        @color/hb_text_primary, @color/hb_text_secondary, @color/hb_emergency_red,
+        @color/hb_on_emergency
+    These are expected until Aditya's foundation PR is merged.
+-->
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- ════════════════════════════════════════════
+             1. HEADER
+             ════════════════════════════════════════════ -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+
+            <!-- App name + tagline -->
+            <LinearLayout
+                android:id="@+id/headerTextBlock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Health Bridge"
+                    android:textColor="@color/hb_text_on_dark"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.8"
+                    android:text="Bridging Patient History with Better Doctor Decisions"
+                    android:textColor="@color/hb_text_on_dark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Avatar placeholder (cosmetic only) -->
+            <ImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="Patient avatar"
+                android:src="@android:drawable/ic_menu_myplaces" />
+        </RelativeLayout>
+
+        <!-- Greeting -->
+        <TextView
+            android:id="@+id/tvGreeting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Good Morning,"
+            android:textColor="@color/hb_text_on_dark"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvPatientName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Loading..."
+            android:textColor="@color/hb_text_on_dark"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <!-- ════════════════════════════════════════════
+             2. EMERGENCY RED-ALERT CARD
+             ════════════════════════════════════════════ -->
+        <LinearLayout
+            android:id="@+id/cardEmergency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_emergency_card"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Title row -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="Emergency alert icon"
+                    android:src="@android:drawable/ic_dialog_alert"
+                    android:tint="@color/hb_on_emergency" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Emergency Info"
+                    android:textColor="@color/hb_on_emergency"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Blood Group – shown large -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.7"
+                android:text="Blood Group"
+                android:textColor="@color/hb_on_emergency"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvBloodGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Not provided"
+                android:textColor="@color/hb_on_emergency"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <!-- Allergies -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.7"
+                android:text="Allergies"
+                android:textColor="@color/hb_on_emergency"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvAllergies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Not provided"
+                android:textColor="@color/hb_on_emergency"
+                android:textSize="14sp" />
+
+            <!-- Emergency Contact -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.7"
+                android:text="Emergency Contact"
+                android:textColor="@color/hb_on_emergency"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvEmergencyContact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Not provided"
+                android:textColor="@color/hb_on_emergency"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- ════════════════════════════════════════════
+             3. VITALS GLASS CARD
+             ════════════════════════════════════════════ -->
+        <LinearLayout
+            android:id="@+id/cardVitals"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_glass_card"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Vitals"
+                android:textColor="@color/hb_text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Height / Weight row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvHeight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Height: --"
+                    android:textColor="@color/hb_text_primary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvWeight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Weight: --"
+                    android:textColor="@color/hb_text_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- BMI row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="BMI:"
+                    android:textColor="@color/hb_text_primary"
+                    android:textSize="14sp" />
+
+                <!-- BMI badge pill -->
+                <TextView
+                    android:id="@+id/tvBmiBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:text="N/A"
+                    android:textColor="@color/hb_text_on_dark"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ════════════════════════════════════════════
+             4. QUICK ACTIONS
+             ════════════════════════════════════════════ -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Quick Actions"
+            android:textColor="@color/hb_text_on_dark"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Row 1: SOS  |  Nearby Hospitals -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <!-- SOS Tile (red accent) -->
+            <LinearLayout
+                android:id="@+id/tileSos"
+                android:layout_width="0dp"
+                android:layout_height="96dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_glass_card"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="SOS emergency call">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="4dp"
+                    android:contentDescription="SOS icon"
+                    android:src="@android:drawable/ic_menu_call"
+                    android:tint="@color/hb_emergency_red" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SOS"
+                    android:textColor="@color/hb_emergency_red"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Nearby Hospitals -->
+            <LinearLayout
+                android:id="@+id/tileHospitals"
+                android:layout_width="0dp"
+                android:layout_height="96dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_glass_card"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Find nearby hospitals">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="4dp"
+                    android:contentDescription="Hospital icon"
+                    android:src="@android:drawable/ic_menu_mylocation"
+                    android:tint="@color/hb_teal_primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nearby Hospitals"
+                    android:textColor="@color/hb_text_primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Row 2: Doctor Summary  |  QR Code -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal">
+
+            <!-- Doctor Summary -->
+            <LinearLayout
+                android:id="@+id/tileDoctorSummary"
+                android:layout_width="0dp"
+                android:layout_height="96dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_glass_card"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Generate doctor summary PDF">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="4dp"
+                    android:contentDescription="Document icon"
+                    android:src="@android:drawable/ic_menu_agenda"
+                    android:tint="@color/hb_teal_primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Doctor Summary"
+                    android:textColor="@color/hb_text_primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- QR Code -->
+            <LinearLayout
+                android:id="@+id/tileQrCode"
+                android:layout_width="0dp"
+                android:layout_height="96dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_glass_card"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Share via QR code">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="4dp"
+                    android:contentDescription="QR code icon"
+                    android:src="@android:drawable/ic_menu_gallery"
+                    android:tint="@color/hb_teal_primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="QR Code"
+                    android:textColor="@color/hb_text_primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ════════════════════════════════════════════
+             5. VAULT ENTRY BUTTON
+             ════════════════════════════════════════════ -->
+        <LinearLayout
+            android:id="@+id/btnVault"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_button_primary"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Open medical document vault">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="My Medical Vault"
+                android:textColor="@color/hb_text_on_dark"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- ════════════════════════════════════════════
+             6. LOADING INDICATOR (hidden by default)
+             ════════════════════════════════════════════ -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</ScrollView>
