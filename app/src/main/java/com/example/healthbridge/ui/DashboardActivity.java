@@ -2,15 +2,11 @@ package com.example.healthbridge.ui;
 
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.healthbridge.R;
-
 /**
- * Dashboard screen — placeholder for Sonali to implement.
- * Will display: Emergency card, BMI, SOS, Hospitals, Doctor PDF, QR actions.
+ * Dashboard screen (Protected Route).
+ * Extends BaseProtectedActivity so unauthenticated users cannot access this screen.
  */
-public class DashboardActivity extends AppCompatActivity {
+public class DashboardActivity extends BaseProtectedActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,4 +15,3 @@ public class DashboardActivity extends AppCompatActivity {
         // setContentView(R.layout.activity_dashboard);
     }
 }
-

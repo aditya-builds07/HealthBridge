@@ -2,15 +2,11 @@ package com.example.healthbridge.ui;
 
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.healthbridge.R;
-
 /**
- * Document Vault screen — placeholder for Atharv to implement.
- * Will display: file list, search, category chips, FAB for upload, preview.
+ * Document Vault screen (Protected Route).
+ * Extends BaseProtectedActivity so unauthenticated users cannot access this screen.
  */
-public class VaultActivity extends AppCompatActivity {
+public class VaultActivity extends BaseProtectedActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,4 +15,3 @@ public class VaultActivity extends AppCompatActivity {
         // setContentView(R.layout.activity_vault);
     }
 }
-
