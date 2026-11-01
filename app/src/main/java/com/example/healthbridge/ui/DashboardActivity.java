@@ -1,6 +1,5 @@
 package com.example.healthbridge.ui;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -116,21 +115,21 @@ public class DashboardActivity extends AppCompatActivity {
         findViewById(R.id.tileHospitals).setOnClickListener(v -> handleNearbyHospitalsClick());
 
         // Doctor Summary — PDF generation
-        // TODO [INTEGRATION] Wire to Aditya's HealthBridgePdfGenerator
+        // TODO [INTEGRATION - BLOCKED] Wire to Aditya's HealthBridgePdfGenerator
         findViewById(R.id.tileDoctorSummary).setOnClickListener(v ->
                 Toast.makeText(this,
                         "Doctor Summary — awaiting PDF generator integration",
                         Toast.LENGTH_SHORT).show());
 
         // QR Code — share popup
-        // TODO [INTEGRATION] Wire to Aditya's QrCodeHelper
+        // TODO [INTEGRATION - BLOCKED] Wire to Aditya's QrCodeHelper
         findViewById(R.id.tileQrCode).setOnClickListener(v ->
                 Toast.makeText(this,
                         "QR Code — awaiting QR helper integration",
                         Toast.LENGTH_SHORT).show());
 
         // Medical Vault
-        // TODO [INTEGRATION] Wire to Atharv's VaultActivity
+        // TODO [INTEGRATION - BLOCKED] Wire to Atharv's VaultActivity
         findViewById(R.id.btnVault).setOnClickListener(v -> {
             try {
                 // Uncomment when VaultActivity is available:
@@ -157,7 +156,7 @@ public class DashboardActivity extends AppCompatActivity {
         }
         try {
             Intent dialIntent = new Intent(Intent.ACTION_DIAL);
-            dialIntent.setData(Uri.parse("tel:" + emergencyPhone.trim()));
+            dialIntent.setData(Uri.parse("tel:" + Uri.encode(emergencyPhone.trim())));
             startActivity(dialIntent);
         } catch (Exception e) {
             Toast.makeText(this,
@@ -175,7 +174,7 @@ public class DashboardActivity extends AppCompatActivity {
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmUri);
             mapIntent.setPackage("com.google.android.apps.maps");
             startActivity(mapIntent);
-        } catch (ActivityNotFoundException e) {
+        } catch (Exception e) {
             // Fallback: open in browser
             try {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW,
@@ -195,10 +194,11 @@ public class DashboardActivity extends AppCompatActivity {
     /**
      * Fetches the user profile from Supabase via Retrofit and populates the UI.
      *
-     * TODO [INTEGRATION] Replace the placeholder below with a real Retrofit call
-     * once Aditya's SupabaseClient, SupabaseApiService, and Profile model are on main.
+     * TODO [INTEGRATION - BLOCKED] Replace the simulated loader below with the real
+     * Retrofit call once Aditya's SupabaseClient, SupabaseApiService, Profile model,
+     * and Priti's SessionManager are committed to main.
      *
-     * The call should be:
+     * The call will be:
      *   String userId = SessionManager.getUserId(this);            // Priti
      *   SupabaseApiService api = SupabaseClient.getService();      // Aditya
      *   Call<List<Profile>> call = api.getProfile("eq." + userId); // Aditya
@@ -208,7 +208,7 @@ public class DashboardActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
 
         // ── PLACEHOLDER: Simulated profile for UI verification ──────────
-        // Remove this block and uncomment the Retrofit call above after integration.
+        // Remove this block and uncomment the Retrofit call below after integration.
         simulateProfileLoad(
                 "Rahul Sharma",
                 "B+",

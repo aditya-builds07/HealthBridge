@@ -120,7 +120,8 @@
                     android:layout_marginEnd="8dp"
                     android:contentDescription="Emergency alert icon"
                     android:src="@android:drawable/ic_dialog_alert"
-                    android:tint="@color/hb_on_emergency" />
+                    android:tint="@color/hb_on_emergency"
+                    app:tint="@color/hb_on_emergency" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -303,7 +304,8 @@
                     android:layout_marginBottom="4dp"
                     android:contentDescription="SOS icon"
                     android:src="@android:drawable/ic_menu_call"
-                    android:tint="@color/hb_emergency_red" />
+                    android:tint="@color/hb_emergency_red"
+                    app:tint="@color/hb_emergency_red" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -334,7 +336,8 @@
                     android:layout_marginBottom="4dp"
                     android:contentDescription="Hospital icon"
                     android:src="@android:drawable/ic_menu_mylocation"
-                    android:tint="@color/hb_teal_primary" />
+                    android:tint="@color/hb_teal_primary"
+                    app:tint="@color/hb_teal_primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -373,7 +376,8 @@
                     android:layout_marginBottom="4dp"
                     android:contentDescription="Document icon"
                     android:src="@android:drawable/ic_menu_agenda"
-                    android:tint="@color/hb_teal_primary" />
+                    android:tint="@color/hb_teal_primary"
+                    app:tint="@color/hb_teal_primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -404,7 +408,8 @@
                     android:layout_marginBottom="4dp"
                     android:contentDescription="QR code icon"
                     android:src="@android:drawable/ic_menu_gallery"
-                    android:tint="@color/hb_teal_primary" />
+                    android:tint="@color/hb_teal_primary"
+                    app:tint="@color/hb_teal_primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
