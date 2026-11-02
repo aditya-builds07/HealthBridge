@@ -24,6 +24,12 @@
             </intent-filter>
         </activity>
 
+        <!-- Sign Up Screen -->
+        <activity
+            android:name=".ui.SignUpActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!-- Dashboard -->
         <activity
             android:name=".ui.DashboardActivity"

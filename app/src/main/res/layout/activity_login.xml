@@ -77,6 +77,18 @@
             android:layout_marginTop="16dp"
             android:visibility="gone" />
 
+        <!-- Create Account Link -->
+        <TextView
+            android:id="@+id/textSignUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/link_create_account"
+            android:textSize="14sp"
+            android:textColor="@color/hb_teal_primary"
+            android:clickable="true"
+            android:focusable="true" />
+
     </LinearLayout>
 
 </ScrollView>

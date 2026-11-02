@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -63,6 +64,16 @@ public class LoginActivity extends AppCompatActivity {
                 attemptLogin();
             }
         });
+
+        TextView textSignUp = findViewById(R.id.textSignUp);
+        if (textSignUp != null) {
+            textSignUp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+                }
+            });
+        }
     }
 
     private void attemptLogin() {
@@ -157,6 +168,10 @@ public class LoginActivity extends AppCompatActivity {
                 setLoading(false);
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
                     Profile profile = response.body().get(0);
+                    AuthResponse demoAuth = new AuthResponse();
+                    demoAuth.setAccessToken("demo_access_token");
+                    demoAuth.setExpiresIn(86400); // 24 hours
+                    sessionManager.saveSession(demoAuth);
                     sessionManager.saveProfileInfo(profile.getId(), profile.getFullName());
                     Toast.makeText(LoginActivity.this,
                             "Email unconfirmed: entered demo mode.",
