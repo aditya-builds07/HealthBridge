@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Login screen specific strings -->
+    <string name="login_tagline">Bridging Patient History with Better Doctor Decisions</string>
+    <string name="login_logo_description">Health Bridge Logo</string>
+</resources>
+

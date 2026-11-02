@@ -1,80 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/hb_card_solid">
+    android:background="@drawable/bg_gradient">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp">
+        android:gravity="center_horizontal"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="64dp"
+        android:paddingBottom="32dp">
 
-        <!-- App Title -->
+        <!-- Logo Circle: teal circle with white medical cross icon -->
+        <FrameLayout
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:background="@drawable/bg_login_logo_circle"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/login_logo_description">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="✚"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                android:textColor="@color/hb_text_on_dark"
+                android:importantForAccessibility="no" />
+        </FrameLayout>
+
+        <!-- App Name -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/app_name"
             android:textSize="28sp"
             android:textStyle="bold"
-            android:textColor="@color/hb_teal_primary"
+            android:textColor="@color/hb_text_on_dark"
             android:layout_marginBottom="8dp" />
 
+        <!-- Tagline -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/login_subtitle"
+            android:text="@string/login_tagline"
             android:textSize="14sp"
-            android:textColor="@color/hb_text_secondary"
+            android:textColor="@color/hb_text_on_dark"
+            android:alpha="0.8"
+            android:gravity="center"
             android:layout_marginBottom="48dp" />
 
-        <!-- Email Input -->
-        <com.google.android.material.textfield.TextInputLayout
+        <!-- Glass Card containing login form -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="@string/hint_email">
+            android:orientation="vertical"
+            android:background="@drawable/bg_glass_card"
+            android:padding="24dp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editEmail"
+            <!-- Email Input: rounded 16dp, white fill -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:text="rahul@healthbridge.com" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginBottom="16dp"
+                android:hint="@string/hint_email"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxBackgroundColor="@android:color/white"
+                app:boxStrokeColor="@color/hb_teal_primary"
+                app:hintTextColor="@color/hb_teal_primary">
 
-        <!-- Password Input -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:hint="@string/hint_password">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/hb_text_primary"
+                    android:text="rahul@healthbridge.com" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editPassword"
+            <!-- Password Input: rounded 16dp, white fill, toggle visibility -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:text="123456" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginBottom="24dp"
+                android:hint="@string/hint_password"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxBackgroundColor="@android:color/white"
+                app:boxStrokeColor="@color/hb_teal_primary"
+                app:hintTextColor="@color/hb_teal_primary"
+                app:endIconMode="password_toggle">
 
-        <!-- Login Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="@string/btn_login"
-            android:textSize="16sp"
-            android:backgroundTint="@color/hb_teal_primary" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textColor="@color/hb_text_primary"
+                    android:text="123456" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Progress -->
+            <!-- Login Button: full-width, teal, pill-shaped -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="@string/btn_login"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                app:cornerRadius="16dp"
+                app:backgroundTint="@color/hb_teal_primary" />
+
+        </LinearLayout>
+
+        <!-- Loading Progress Indicator -->
         <ProgressBar
             android:id="@+id/progressLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
+            android:indeterminateTint="@color/hb_text_on_dark"
             android:visibility="gone" />
 
     </LinearLayout>
