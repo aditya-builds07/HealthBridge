@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Strings for DashboardActivity (Sonali) -->
+    <string name="tagline">Bridging Patient History with Better Doctor Decisions</string>
+    <string name="cd_patient_avatar">Patient avatar</string>
+    <string name="cd_emergency_alert">Emergency alert</string>
+    <string name="greeting_morning">Good Morning,</string>
+    <string name="greeting_afternoon">Good Afternoon,</string>
+    <string name="greeting_evening">Good Evening,</string>
+    <string name="default_patient_name">Patient</string>
+    <string name="vitals_title">Health Vitals</string>
+    <string name="vitals_height">Height</string>
+    <string name="vitals_weight">Weight</string>
+    <string name="vitals_bp">Blood Pressure</string>
+    <string name="vitals_sugar">Sugar</string>
+    <string name="quick_actions_title">Quick Actions</string>
+    <string name="vault_subtitle">Prescriptions, lab reports, X-rays</string>
+    <string name="cd_open_vault">Open medical vault</string>
+    <string name="error_load_data">Could not load your data. Check your internet and try again.</string>
+    <string name="error_dialer">Unable to open phone dialer on this device.</string>
+    <string name="error_maps">No map or browser app available to search for hospitals.</string>
+    <string name="error_create_summary">Could not create the summary. Please try again.</string>
+    <string name="success_summary_created">Doctor Summary PDF generated successfully.</string>
+    <string name="error_qr">Could not display QR code. Please try again.</string>
+    <string name="qr_dialog_title">Doctor Summary</string>
 </resources>
-
