@@ -420,8 +420,9 @@ public class VaultActivity extends BaseProtectedActivity {
         int sessionProfileId = SessionManager.getInstance(this).getProfileId();
         final int profileId = sessionProfileId > 0 ? sessionProfileId : 1;
 
-        String sanitized = sanitizeFileName(pendingFile.displayName);
-        String storagePath = profileId + "/" + System.currentTimeMillis() + "_" + sanitized;
+        String sanitizedCategory = category.replace(" ", "_");
+        String sanitizedName = sanitizeFileName(pendingFile.displayName);
+        String storagePath = sanitizedCategory + "/" + profileId + "_" + System.currentTimeMillis() + "_" + sanitizedName;
 
         final String finalMimeType = pendingFile.mimeType;
         final byte[] uploadData = pendingFile.data;
@@ -452,7 +453,7 @@ public class VaultActivity extends BaseProtectedActivity {
                             return;
                         }
 
-                        if (insertResponse.isSuccessful() && insertResponse.body() != null) {
+                        if (insertResponse.isSuccessful()) {
                             if (layoutUploading != null) layoutUploading.setVisibility(View.GONE);
                             if (fabUpload != null) fabUpload.setEnabled(true);
                             pendingFile = null;

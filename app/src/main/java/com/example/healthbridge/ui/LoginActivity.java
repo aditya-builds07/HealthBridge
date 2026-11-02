@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.healthbridge.R;
 import com.example.healthbridge.api.SupabaseApiService;
@@ -33,11 +35,13 @@ public class LoginActivity extends AppCompatActivity {
 
     private TextInputEditText editEmail, editPassword;
     private MaterialButton btnLogin;
+    private TextView textSignUp;
     private ProgressBar progressLogin;
     private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
 
         // Initialize SupabaseClient with context for token injection
@@ -55,6 +59,7 @@ public class LoginActivity extends AppCompatActivity {
         editEmail = findViewById(R.id.editEmail);
         editPassword = findViewById(R.id.editPassword);
         btnLogin = findViewById(R.id.btnLogin);
+        textSignUp = findViewById(R.id.textSignUp);
         progressLogin = findViewById(R.id.progressLogin);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +68,16 @@ public class LoginActivity extends AppCompatActivity {
                 attemptLogin();
             }
         });
+
+        if (textSignUp != null) {
+            textSignUp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
     private void attemptLogin() {
@@ -159,7 +174,7 @@ public class LoginActivity extends AppCompatActivity {
                     Profile profile = response.body().get(0);
                     sessionManager.saveProfileInfo(profile.getId(), profile.getFullName());
                     Toast.makeText(LoginActivity.this,
-                            "Email unconfirmed: entered demo mode.",
+                            getString(R.string.login_success),
                             Toast.LENGTH_SHORT).show();
                     navigateToDashboard();
                 } else {
@@ -184,5 +199,8 @@ public class LoginActivity extends AppCompatActivity {
     private void setLoading(boolean loading) {
         progressLogin.setVisibility(loading ? View.VISIBLE : View.GONE);
         btnLogin.setEnabled(!loading);
+        if (textSignUp != null) {
+            textSignUp.setEnabled(!loading);
+        }
     }
 }

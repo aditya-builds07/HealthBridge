@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Personal Health Profile Setup -->
+    <string name="profile_setup_title">Let\'s Set Up Your Health Profile!</string>
+    <string name="profile_setup_subtitle">This information helps organize your personal medical records and prepare doctor summaries.</string>
+    <string name="banner_complete_profile">Profile incomplete • Tap to finish health setup</string>
+    <string name="hint_age">Age</string>
+    <string name="hint_dob">Date of Birth</string>
+    <string name="hint_blood_group">Blood Group</string>
+    <string name="hint_height_cm">Height (cm)</string>
+    <string name="hint_weight_kg">Weight (kg)</string>
+    <string name="hint_known_allergies">Known Allergies</string>
+    <string name="hint_allergy_suggestions">Quick suggestions (tap to add):</string>
+    <string name="chip_no_allergies">No known allergies</string>
+    <string name="section_emergency_contact">Emergency Contact</string>
+    <string name="hint_emergency_name">Contact Name</string>
+    <string name="hint_emergency_relation">Relationship (e.g. Spouse)</string>
+    <string name="hint_emergency_phone">Phone Number</string>
+    <string name="btn_save_continue">Save &amp; Continue</string>
+    <string name="btn_skip_for_now">Skip for Now</string>
+
+    <!-- Validation & Feedback -->
+    <string name="error_age_required">Please enter your age</string>
+    <string name="error_age_invalid">Please enter a valid age (1-120)</string>
+    <string name="error_blood_group_required">Please select a blood group</string>
+    <string name="error_height_required">Please enter your height</string>
+    <string name="error_height_invalid">Please enter a valid height in cm (30-260)</string>
+    <string name="error_weight_required">Please enter your weight</string>
+    <string name="error_weight_invalid">Please enter a valid weight in kg (2-350)</string>
+    <string name="error_emergency_name_required">Please enter emergency contact name</string>
+    <string name="error_emergency_phone_required">Please enter emergency contact phone</string>
+    <string name="error_emergency_phone_invalid">Please enter a valid phone number (at least 7 digits)</string>
+    <string name="profile_setup_success">Health profile saved successfully</string>
+    <string name="profile_setup_failed">Failed to save health profile. Please try again.</string>
+    <string name="profile_setup_skipped_hint">You can complete your profile anytime from the top-right profile icon.</string>
+</resources>
+

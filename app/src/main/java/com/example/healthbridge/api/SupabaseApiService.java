@@ -6,12 +6,14 @@ import com.example.healthbridge.models.Medication;
 import com.example.healthbridge.models.Profile;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Query;
@@ -37,6 +39,18 @@ public interface SupabaseApiService {
     Call<List<Profile>> getProfileByUserId(
             @Query("select") String select,
             @Query("user_id") String userIdFilter // e.g. "eq.105e12f7-..."
+    );
+
+    @PATCH("profiles")
+    Call<List<Profile>> updateProfile(
+            @Query("id") String idFilter,
+            @Body Map<String, Object> updates
+    );
+
+    @PATCH("profiles")
+    Call<List<Profile>> updateProfileByUserId(
+            @Query("user_id") String userIdFilter,
+            @Body Map<String, Object> updates
     );
 
     // ── Medical Records ───────────────────────────────────────

@@ -41,12 +41,28 @@ public class MedicalHistoryDialogHelper {
     }
 
     /**
-     * Displays the Add Medical History dialog.
+     * Shows medical history dialog adhering to PRD requirements.
      *
-     * @param context  Calling Activity or Context
-     * @param listener Optional callback invoked upon successful insertion
+     * @param ctx       Activity or Context
+     * @param profileId Profile ID to associate medical history with
+     * @param onSaved   Callback invoked when saved successfully
+     */
+    public static void show(final Context ctx, final int profileId, final Runnable onSaved) {
+        showDialogInternal(ctx, profileId, onSaved, null);
+    }
+
+    /**
+     * Displays the Add Medical History dialog with custom listener.
      */
     public static void showAddMedicalHistoryDialog(final Context context, final OnMedicalHistoryAddedListener listener) {
+        int profileId = SessionManager.getInstance(context).getProfileId();
+        if (profileId <= 0) {
+            profileId = 1;
+        }
+        showDialogInternal(context, profileId, null, listener);
+    }
+
+    private static void showDialogInternal(final Context context, final int profileId, final Runnable onSaved, final OnMedicalHistoryAddedListener listener) {
         if (context == null) return;
 
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -67,109 +83,88 @@ public class MedicalHistoryDialogHelper {
         // Date picker dialog on clicking the date field
         editDate.setFocusable(false);
         editDate.setClickable(true);
-        editDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new DatePickerDialog(
-                        context,
-                        (view, year, month, dayOfMonth) -> {
-                            calendar.set(Calendar.YEAR, year);
-                            calendar.set(Calendar.MONTH, month);
-                            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                            editDate.setText(dateFormat.format(calendar.getTime()));
-                        },
-                        calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH),
-                        calendar.get(Calendar.DAY_OF_MONTH)
-                ).show();
-            }
-        });
+        editDate.setOnClickListener(v -> new DatePickerDialog(
+                context,
+                (view, year, month, dayOfMonth) -> {
+                    calendar.set(Calendar.YEAR, year);
+                    calendar.set(Calendar.MONTH, month);
+                    calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                    editDate.setText(dateFormat.format(calendar.getTime()));
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        ).show());
 
         final AlertDialog dialog = new MaterialAlertDialogBuilder(context)
                 .setView(dialogView)
                 .setCancelable(true)
                 .create();
 
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnSave.setOnClickListener(v -> {
+            String condition = editCondition.getText() != null ? editCondition.getText().toString().trim() : "";
+            String diagnosedOn = editDate.getText() != null ? editDate.getText().toString().trim() : "";
+            String notes = editNotes.getText() != null ? editNotes.getText().toString().trim() : "";
+
+            // Field validations: condition and diagnosis date are required; notes is optional
+            if (condition.isEmpty()) {
+                Toast.makeText(context, context.getString(R.string.error_history_condition_required), Toast.LENGTH_SHORT).show();
+                editCondition.requestFocus();
+                return;
             }
-        });
+            if (diagnosedOn.isEmpty()) {
+                Toast.makeText(context, context.getString(R.string.error_history_date_required), Toast.LENGTH_SHORT).show();
+                editDate.requestFocus();
+                return;
+            }
 
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String condition = editCondition.getText() != null ? editCondition.getText().toString().trim() : "";
-                String diagnosedOn = editDate.getText() != null ? editDate.getText().toString().trim() : "";
-                String notes = editNotes.getText() != null ? editNotes.getText().toString().trim() : "";
+            // Prevent duplicate submissions & show progress
+            btnSave.setEnabled(false);
+            btnCancel.setEnabled(false);
+            progressHistory.setVisibility(View.VISIBLE);
+            dialog.setCancelable(false);
 
-                // Field validations
-                if (condition.isEmpty()) {
-                    Toast.makeText(context, context.getString(R.string.error_history_condition_required), Toast.LENGTH_SHORT).show();
-                    editCondition.requestFocus();
-                    return;
-                }
-                if (diagnosedOn.isEmpty()) {
-                    Toast.makeText(context, context.getString(R.string.error_history_date_required), Toast.LENGTH_SHORT).show();
-                    editDate.requestFocus();
-                    return;
-                }
-                if (notes.isEmpty()) {
-                    Toast.makeText(context, context.getString(R.string.error_history_notes_required), Toast.LENGTH_SHORT).show();
-                    editNotes.requestFocus();
-                    return;
-                }
+            int finalProfileId = profileId > 0 ? profileId : 1;
+            final MedicalHistory newHistory = new MedicalHistory(finalProfileId, condition, notes, diagnosedOn);
 
-                // Prevent duplicate submissions & show progress
-                btnSave.setEnabled(false);
-                btnCancel.setEnabled(false);
-                progressHistory.setVisibility(View.VISIBLE);
-                dialog.setCancelable(false);
-
-                // Retrieve authenticated user's profile_id (fallback to 1 for demo persona if profileId not set)
-                int profileId = SessionManager.getInstance(context).getProfileId();
-                if (profileId <= 0) {
-                    profileId = 1;
-                }
-
-                final MedicalHistory newHistory = new MedicalHistory(profileId, condition, notes, diagnosedOn);
-
-                SupabaseApiService apiService = SupabaseClient.getApiService();
-                apiService.insertMedicalHistory(newHistory).enqueue(new Callback<List<MedicalHistory>>() {
-                    @Override
-                    public void onResponse(Call<List<MedicalHistory>> call, Response<List<MedicalHistory>> response) {
-                        if (response.isSuccessful()) {
-                            Toast.makeText(context, context.getString(R.string.success_history_added), Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
-                            if (listener != null) {
-                                MedicalHistory created = (response.body() != null && !response.body().isEmpty())
-                                        ? response.body().get(0)
-                                        : newHistory;
-                                listener.onMedicalHistoryAdded(created);
-                            }
-                        } else {
-                            btnSave.setEnabled(true);
-                            btnCancel.setEnabled(true);
-                            progressHistory.setVisibility(View.GONE);
-                            dialog.setCancelable(true);
-                            Toast.makeText(context, context.getString(R.string.error_history_add_failed), Toast.LENGTH_SHORT).show();
+            SupabaseApiService apiService = SupabaseClient.getApiService();
+            apiService.insertMedicalHistory(newHistory).enqueue(new Callback<List<MedicalHistory>>() {
+                @Override
+                public void onResponse(Call<List<MedicalHistory>> call, Response<List<MedicalHistory>> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(context, context.getString(R.string.success_history_added), Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        if (onSaved != null) {
+                            onSaved.run();
                         }
-                    }
-
-                    @Override
-                    public void onFailure(Call<List<MedicalHistory>> call, Throwable t) {
+                        if (listener != null) {
+                            MedicalHistory created = (response.body() != null && !response.body().isEmpty())
+                                    ? response.body().get(0)
+                                    : newHistory;
+                            listener.onMedicalHistoryAdded(created);
+                        }
+                    } else {
                         btnSave.setEnabled(true);
                         btnCancel.setEnabled(true);
                         progressHistory.setVisibility(View.GONE);
                         dialog.setCancelable(true);
-                        Toast.makeText(context, context.getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, context.getString(R.string.error_history_add_failed), Toast.LENGTH_SHORT).show();
                     }
-                });
-            }
+                }
+
+                @Override
+                public void onFailure(Call<List<MedicalHistory>> call, Throwable t) {
+                    btnSave.setEnabled(true);
+                    btnCancel.setEnabled(true);
+                    progressHistory.setVisibility(View.GONE);
+                    dialog.setCancelable(true);
+                    Toast.makeText(context, context.getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                }
+            });
         });
 
         dialog.show();
     }
 }
-

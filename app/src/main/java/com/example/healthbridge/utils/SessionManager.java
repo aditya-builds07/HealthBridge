@@ -18,6 +18,7 @@ public class SessionManager {
     private static final String KEY_USER_EMAIL = "user_email";
     private static final String KEY_PROFILE_ID = "profile_id";
     private static final String KEY_PROFILE_NAME = "profile_name";
+    private static final String KEY_PROFILE_SKIPPED = "profile_setup_skipped_";
 
     private static SessionManager instance;
     private final SharedPreferences prefs;
@@ -87,6 +88,16 @@ public class SessionManager {
         return prefs.getString(KEY_PROFILE_NAME, null);
     }
 
+    public boolean isProfileSetupSkipped(String userId) {
+        if (userId == null) return false;
+        return prefs.getBoolean(KEY_PROFILE_SKIPPED + userId, false);
+    }
+
+    public void setProfileSetupSkipped(String userId, boolean skipped) {
+        if (userId == null) return;
+        prefs.edit().putBoolean(KEY_PROFILE_SKIPPED + userId, skipped).apply();
+    }
+
     /**
      * Check if a valid session exists.
      */
@@ -107,4 +118,3 @@ public class SessionManager {
         prefs.edit().clear().apply();
     }
 }
-

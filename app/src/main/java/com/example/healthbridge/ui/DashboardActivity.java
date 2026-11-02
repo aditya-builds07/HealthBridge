@@ -23,6 +23,13 @@ import com.example.healthbridge.models.MedicalHistory;
 import com.example.healthbridge.models.Medication;
 import com.example.healthbridge.models.Profile;
 import com.example.healthbridge.utils.HealthBridgePdfGenerator;
+import com.example.healthbridge.utils.SummaryPdfUploader;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import com.example.healthbridge.utils.MedicationDialog;
+import com.example.healthbridge.utils.HistoryDialog;
+import com.example.healthbridge.utils.ProfileSetupDialogHelper;
+import android.widget.Toast;
 import com.example.healthbridge.utils.HealthUtils;
 import com.example.healthbridge.utils.QrCodeHelper;
 import com.example.healthbridge.utils.SessionManager;
@@ -65,8 +72,6 @@ public class DashboardActivity extends BaseProtectedActivity {
     private TextView tvBmiBadge;
     private TextView tvHeight;
     private TextView tvWeight;
-    private TextView tvBloodPressure;
-    private TextView tvSugar;
 
     // Quick Actions & Vault views
     private View btnSos;
@@ -74,9 +79,16 @@ public class DashboardActivity extends BaseProtectedActivity {
     private View btnDoctorSummary;
     private View btnQrCode;
     private View cardVault;
+    private View btnAddMedication;
+    private View btnAddHistory;
+    private View btnLogout;
+    private View imgAvatar;
+    private View cardEmergency;
+    private View cardCompleteProfileBanner;
 
     private SessionManager sessionManager;
     private Profile currentProfile;
+    private String lastSummaryUrl = null;
     private ExecutorService executorService;
     private Handler mainHandler;
 
@@ -134,14 +146,18 @@ public class DashboardActivity extends BaseProtectedActivity {
         tvBmiBadge = findViewById(R.id.tvBmiBadge);
         tvHeight = findViewById(R.id.tvHeight);
         tvWeight = findViewById(R.id.tvWeight);
-        tvBloodPressure = findViewById(R.id.tvBloodPressure);
-        tvSugar = findViewById(R.id.tvSugar);
 
         btnSos = findViewById(R.id.btnSos);
         btnHospitals = findViewById(R.id.btnHospitals);
         btnDoctorSummary = findViewById(R.id.btnDoctorSummary);
         btnQrCode = findViewById(R.id.btnQrCode);
         cardVault = findViewById(R.id.cardVault);
+        btnAddMedication = findViewById(R.id.btnAddMedication);
+        btnAddHistory = findViewById(R.id.btnAddHistory);
+        btnLogout = findViewById(R.id.btnLogout);
+        imgAvatar = findViewById(R.id.imgAvatar);
+        cardEmergency = findViewById(R.id.cardEmergency);
+        cardCompleteProfileBanner = findViewById(R.id.cardCompleteProfileBanner);
     }
 
     private void setupClickListeners() {
@@ -150,6 +166,30 @@ public class DashboardActivity extends BaseProtectedActivity {
         btnDoctorSummary.setOnClickListener(v -> handleDoctorSummary());
         btnQrCode.setOnClickListener(v -> handleQrCode());
         cardVault.setOnClickListener(v -> handleOpenVault());
+        if (btnAddMedication != null) {
+            btnAddMedication.setOnClickListener(v -> {
+                int profileId = currentProfile != null ? currentProfile.getId() : sessionManager.getProfileId();
+                MedicationDialog.show(DashboardActivity.this, profileId, this::loadDashboardData);
+            });
+        }
+        if (btnAddHistory != null) {
+            btnAddHistory.setOnClickListener(v -> {
+                int profileId = currentProfile != null ? currentProfile.getId() : sessionManager.getProfileId();
+                HistoryDialog.show(DashboardActivity.this, profileId, this::loadDashboardData);
+            });
+        }
+        if (btnLogout != null) {
+            btnLogout.setOnClickListener(v -> performLogout());
+        }
+        if (imgAvatar != null) {
+            imgAvatar.setOnClickListener(v -> showProfileSetupDialog());
+        }
+        if (cardEmergency != null) {
+            cardEmergency.setOnClickListener(v -> showProfileSetupDialog());
+        }
+        if (cardCompleteProfileBanner != null) {
+            cardCompleteProfileBanner.setOnClickListener(v -> showProfileSetupDialog());
+        }
     }
 
     /**
@@ -178,6 +218,7 @@ public class DashboardActivity extends BaseProtectedActivity {
                     currentProfile = response.body().get(0);
                     sessionManager.saveProfileInfo(currentProfile.getId(), currentProfile.getFullName());
                     bindProfileData(currentProfile);
+                    checkProfileSetupPrompt(currentProfile);
                 } else {
                     showErrorSnackbar();
                 }
@@ -236,9 +277,7 @@ public class DashboardActivity extends BaseProtectedActivity {
             tvWeight.setText(getString(R.string.not_provided));
         }
 
-        // Blood Pressure and Sugar (fields and getters not present in Profile.java)
-        tvBloodPressure.setText(getString(R.string.not_provided));
-        tvSugar.setText(getString(R.string.not_provided));
+
 
         // BMI badge computation via HealthUtils
         String bmi = HealthUtils.calculateBmi(profile.getWeightKg(), profile.getHeightCm());
@@ -255,6 +294,11 @@ public class DashboardActivity extends BaseProtectedActivity {
         pillDrawable.setColor(badgeColor);
         tvBmiBadge.setBackground(pillDrawable);
         tvBmiBadge.setTextColor(ContextCompat.getColor(this, R.color.hb_text_on_dark));
+
+        boolean isComplete = ProfileSetupDialogHelper.isProfileComplete(profile);
+        if (cardCompleteProfileBanner != null) {
+            cardCompleteProfileBanner.setVisibility(isComplete ? View.GONE : View.VISIBLE);
+        }
     }
 
     /**
@@ -266,7 +310,12 @@ public class DashboardActivity extends BaseProtectedActivity {
                 && currentProfile.getEmergencyContactPhone() != null
                 && !currentProfile.getEmergencyContactPhone().trim().isEmpty())
                 ? currentProfile.getEmergencyContactPhone().trim()
-                : "112";
+                : "";
+
+        if (phone.isEmpty()) {
+            Toast.makeText(this, R.string.sos_no_number, Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         Intent dialIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone));
         try {
@@ -307,11 +356,11 @@ public class DashboardActivity extends BaseProtectedActivity {
      * @param triggeringView the tile view tapped by the user, disabled during operation
      * @param onSuccess callback executed on UI thread after successful upload
      */
-    private void ensureSummaryUploaded(View triggeringView, Runnable onSuccess) {
-        ensureSummaryUploaded(triggeringView, onSuccess, null);
+    public interface SummaryResultCallback {
+        void onResult(String cloudUrl, File localFile);
     }
 
-    private void ensureSummaryUploaded(View triggeringView, Runnable onSuccess, Runnable onFailure) {
+    private void ensureSummaryUploaded(View triggeringView, SummaryResultCallback onSuccess, SummaryResultCallback onFailure) {
         if (currentProfile == null) {
             showPlainSnackbar(getString(R.string.error_create_summary));
             return;
@@ -380,7 +429,8 @@ public class DashboardActivity extends BaseProtectedActivity {
         });
     }
 
-    private void generateAndUploadPdf(View triggeringView, List<Medication> medications, List<MedicalHistory> history, Runnable onSuccess, Runnable onFailure) {
+    private void generateAndUploadPdf(View triggeringView, List<Medication> medications, List<MedicalHistory> history,
+                                      SummaryResultCallback onSuccess, SummaryResultCallback onFailure) {
         if (executorService == null || executorService.isShutdown()) {
             executorService = Executors.newSingleThreadExecutor();
         }
@@ -401,42 +451,32 @@ public class DashboardActivity extends BaseProtectedActivity {
                     resetActionState(triggeringView);
                     showPlainSnackbar(getString(R.string.error_create_summary));
                     if (onFailure != null) {
-                        onFailure.run();
+                        onFailure.onResult(null, null);
                     }
                     return;
                 }
 
-                // Step 4: Upload PDF to Supabase storage bucket
-                String uploadUrl = SupabaseClient.STORAGE_URL + SupabaseClient.BUCKET_NAME + "/doctor_summary_" + currentProfile.getId() + ".pdf";
-                RequestBody requestBody = RequestBody.create(MediaType.parse("application/pdf"), generatedFile);
+                String summaryTitle = "Doctor Summary - " + new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(new Date());
 
-                SupabaseClient.getApiService().uploadFile(uploadUrl, "application/pdf", requestBody).enqueue(new Callback<Void>() {
+                // Upload with SummaryPdfUploader (inserts medical_records row under category 'Summary')
+                SummaryPdfUploader.upload(generatedFile, currentProfile.getId(), summaryTitle, new SummaryPdfUploader.Callback() {
                     @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
+                    public void onSuccess(String publicUrl) {
                         if (isFinishing() || isDestroyed()) return;
-
+                        lastSummaryUrl = publicUrl;
                         resetActionState(triggeringView);
-
-                        if (response.isSuccessful()) {
-                            showPlainSnackbar(getString(R.string.success_summary_created));
-                            if (onSuccess != null) {
-                                onSuccess.run();
-                            }
-                        } else {
-                            if (onFailure != null) {
-                                onFailure.run();
-                            } else {
-                                showPlainSnackbar(getString(R.string.error_create_summary));
-                            }
+                        showPlainSnackbar(getString(R.string.success_summary_created));
+                        if (onSuccess != null) {
+                            onSuccess.onResult(publicUrl, generatedFile);
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
+                    public void onError(String message) {
                         if (isFinishing() || isDestroyed()) return;
                         resetActionState(triggeringView);
                         if (onFailure != null) {
-                            onFailure.run();
+                            onFailure.onResult(null, generatedFile);
                         } else {
                             showPlainSnackbar(getString(R.string.error_create_summary));
                         }
@@ -455,36 +495,61 @@ public class DashboardActivity extends BaseProtectedActivity {
             return;
         }
 
-        ensureSummaryUploaded(btnDoctorSummary, () -> openDoctorSummaryPdf(currentProfile.getId()));
+        ensureSummaryUploaded(
+            btnDoctorSummary,
+            (cloudUrl, localFile) -> openDoctorSummaryPdf(cloudUrl, localFile),
+            (cloudUrl, localFile) -> {
+                if (localFile != null && localFile.exists()) {
+                    openDoctorSummaryPdf(null, localFile);
+                } else {
+                    showPlainSnackbar(getString(R.string.error_create_summary));
+                }
+            }
+        );
     }
 
     /**
-     * Opens the public Doctor Summary PDF URL with ACTION_VIEW inside try/catch.
+     * Opens the Doctor Summary PDF with ACTION_VIEW through the FileProvider with a browser fallback.
      */
-    private void openDoctorSummaryPdf(int profileId) {
-        String publicPdfUrl = SupabaseClient.STORAGE_PUBLIC_URL + SupabaseClient.BUCKET_NAME + "/doctor_summary_" + profileId + ".pdf";
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(publicPdfUrl));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
+    private void openDoctorSummaryPdf(String cloudUrl, File localFile) {
+        if (localFile != null && localFile.exists()) {
             try {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(publicPdfUrl));
+                Uri contentUri = androidx.core.content.FileProvider.getUriForFile(
+                        this,
+                        getPackageName() + ".fileprovider",
+                        localFile
+                );
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(contentUri, "application/pdf");
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                return;
+            } catch (ActivityNotFoundException ignored) {
+            } catch (Exception ignored) {
+            }
+        }
+
+        String fallbackUrl = (cloudUrl != null && !cloudUrl.trim().isEmpty())
+                ? cloudUrl
+                : (currentProfile != null ? SupabaseClient.STORAGE_PUBLIC_URL + SupabaseClient.BUCKET_NAME + "/doctor_summary_" + currentProfile.getId() + ".pdf" : null);
+
+        if (fallbackUrl != null) {
+            try {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(fallbackUrl));
                 browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
                 browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(browserIntent);
             } catch (Exception ex) {
-                showPlainSnackbar("PDF ready: " + publicPdfUrl);
+                showPlainSnackbar(getString(R.string.error_create_summary));
             }
-        } catch (Exception e) {
+        } else {
             showPlainSnackbar(getString(R.string.error_create_summary));
         }
     }
 
     /**
-     * QR Code click handler: ensures summary is generated and uploaded first, then shows the QR dialog.
-     * Mode A (online): QR encodes cloud PDF URL.
-     * Mode B (offline/fallback): QR encodes plain-text emergency card details.
+     * QR Code click handler: if summary URL exists, shows it directly.
+     * Otherwise generates and uploads first. If offline/failure, shows Emergency Card QR.
      */
     private void handleQrCode() {
         if (currentProfile == null) {
@@ -492,20 +557,24 @@ public class DashboardActivity extends BaseProtectedActivity {
             return;
         }
 
+        if (lastSummaryUrl != null && !lastSummaryUrl.trim().isEmpty()) {
+            QrCodeHelper.showQrDialog(this, lastSummaryUrl, getString(R.string.qr_dialog_title));
+            return;
+        }
+
         ensureSummaryUploaded(
             btnQrCode,
-            () -> {
+            (cloudUrl, localFile) -> {
                 try {
-                    String pdfPublicUrl = SupabaseClient.STORAGE_PUBLIC_URL + SupabaseClient.BUCKET_NAME + "/doctor_summary_" + currentProfile.getId() + ".pdf";
-                    QrCodeHelper.showQrDialog(DashboardActivity.this, pdfPublicUrl, getString(R.string.qr_dialog_title));
+                    QrCodeHelper.showQrDialog(DashboardActivity.this, cloudUrl, getString(R.string.qr_dialog_title));
                 } catch (Exception e) {
                     showPlainSnackbar(getString(R.string.error_qr));
                 }
             },
-            () -> {
+            (cloudUrl, localFile) -> {
                 try {
                     String emergencyText = QrCodeHelper.buildEmergencyText(currentProfile);
-                    QrCodeHelper.showQrDialog(DashboardActivity.this, emergencyText, "Emergency Medical Card");
+                    QrCodeHelper.showQrDialog(DashboardActivity.this, emergencyText, "Emergency Card");
                 } catch (Exception e) {
                     showPlainSnackbar(getString(R.string.error_qr));
                 }
@@ -561,6 +630,28 @@ public class DashboardActivity extends BaseProtectedActivity {
 
     private int dpToPx(int dp) {
         return (int) (dp * getResources().getDisplayMetrics().density + 0.5f);
+    }
+
+    private void checkProfileSetupPrompt(Profile profile) {
+        if (profile == null) return;
+        if (ProfileSetupDialogHelper.isProfileComplete(profile)) {
+            return;
+        }
+        String userId = sessionManager.getUserId();
+        if (sessionManager.isProfileSetupSkipped(userId)) {
+            return;
+        }
+        showProfileSetupDialog();
+    }
+
+    private void showProfileSetupDialog() {
+        ProfileSetupDialogHelper.show(this, currentProfile, updatedProfile -> {
+            if (updatedProfile != null) {
+                currentProfile = updatedProfile;
+                sessionManager.saveProfileInfo(currentProfile.getId(), currentProfile.getFullName());
+                bindProfileData(currentProfile);
+            }
+        });
     }
 
     @Override

@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Health Bridge — Database Schema, Supabase Auth Integration & Demo Seed
+-- Health Bridge — Database Schema & Access Control
 -- Platform: Android (Java + XML + Retrofit2)
 -- Supabase Project: https://awegpsbewzbzazsrrnbr.supabase.co
 -- ==============================================================================
@@ -127,62 +127,9 @@ ON storage.objects FOR UPDATE TO anon, authenticated
 USING (bucket_id = 'healthbridge-files');
 
 -- ------------------------------------------------------------------------------
--- 6. CONFIRM AUTH USER & SEED DEMO DATA
+-- 6. SYNC AUTO-INCREMENT SEQUENCES
 -- ------------------------------------------------------------------------------
--- Auto-confirm rahul@healthbridge.com in Supabase Auth if created
-UPDATE auth.users
-SET email_confirmed_at = NOW()
-WHERE email = 'rahul@healthbridge.com' AND email_confirmed_at IS NULL;
-
--- Seed Profile (id = 1)
-INSERT INTO public.profiles (
-    id, user_id, full_name, email, age, gender, blood_group,
-    height_cm, weight_kg, allergies, emergency_contact_name, emergency_contact_phone
-) VALUES (
-    1,
-    (SELECT id FROM auth.users WHERE email = 'rahul@healthbridge.com' LIMIT 1),
-    'Rahul Sharma',
-    'rahul@healthbridge.com',
-    24,
-    'Male',
-    'O+',
-    172.00,
-    68.50,
-    'Penicillin',
-    'Amit Sharma',
-    '9000000001'
-)
-ON CONFLICT (id) DO UPDATE SET
-    user_id = COALESCE(EXCLUDED.user_id, profiles.user_id),
-    full_name = EXCLUDED.full_name,
-    email = EXCLUDED.email,
-    age = EXCLUDED.age,
-    gender = EXCLUDED.gender,
-    blood_group = EXCLUDED.blood_group,
-    height_cm = EXCLUDED.height_cm,
-    weight_kg = EXCLUDED.weight_kg,
-    allergies = EXCLUDED.allergies,
-    emergency_contact_name = EXCLUDED.emergency_contact_name,
-    emergency_contact_phone = EXCLUDED.emergency_contact_phone;
-
-SELECT setval('public.profiles_id_seq', COALESCE((SELECT MAX(id) FROM public.profiles), 1));
-
--- Seed 3 Medications for Rahul with real values
-DELETE FROM public.medications WHERE profile_id = 1;
-
-INSERT INTO public.medications (profile_id, name, dosage, frequency, start_date, status) VALUES
-(1, 'Vitamin D3', '60,000 IU', 'Once weekly', '2026-01-15', 'Active'),
-(1, 'Cetirizine', '10 mg', 'As needed', '2026-02-01', 'Active'),
-(1, 'Paracetamol', '650 mg', 'SOS', '2026-03-10', 'Completed');
-
-SELECT setval('public.medications_id_seq', COALESCE((SELECT MAX(id) FROM public.medications), 1));
-
--- Seed 3 Medical History Entries for Rahul
-DELETE FROM public.medical_history WHERE profile_id = 1;
-
-INSERT INTO public.medical_history (profile_id, condition, notes, diagnosed_on) VALUES
-(1, 'Seasonal allergic rhinitis', 'Fictional demo entry: pollen trigger', '2024-03-10'),
-(1, 'Mild Asthmatic Bronchitis', 'Triggered by dust, resolved with inhaler', '2022-11-05'),
-(1, 'Appendectomy', 'Laparoscopic surgery, fully recovered', '2019-07-20');
-
-SELECT setval('public.medical_history_id_seq', COALESCE((SELECT MAX(id) FROM public.medical_history), 1));
+SELECT setval('public.profiles_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM public.profiles WHERE id > 0), 1), 1));
+SELECT setval('public.medications_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM public.medications WHERE id > 0), 1), 1));
+SELECT setval('public.medical_history_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM public.medical_history WHERE id > 0), 1), 1));
+SELECT setval('public.medical_records_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM public.medical_records WHERE id > 0), 1), 1));

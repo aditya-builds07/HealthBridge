@@ -5,14 +5,25 @@
 -- ==============================================================================
 
 -- 1. CLEANUP COLUMNS
--- Copy date into diagnosed_on where diagnosed_on is empty, then drop date
-UPDATE public.medical_history
-SET diagnosed_on = date
-WHERE (diagnosed_on IS NULL OR diagnosed_on = '') AND date IS NOT NULL;
+-- Ensure diagnosed_on exists on medical_history
+ALTER TABLE public.medical_history ADD COLUMN IF NOT EXISTS diagnosed_on VARCHAR(50);
 
-ALTER TABLE public.medical_history DROP COLUMN IF EXISTS date;
+-- Safely copy legacy 'date' into 'diagnosed_on' only if 'date' column exists, then drop it
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 
+        FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+          AND table_name = 'medical_history' 
+          AND column_name = 'date'
+    ) THEN
+        EXECUTE 'UPDATE public.medical_history SET diagnosed_on = date WHERE (diagnosed_on IS NULL OR diagnosed_on = '''') AND date IS NOT NULL';
+        EXECUTE 'ALTER TABLE public.medical_history DROP COLUMN date';
+    END IF;
+END $$;
 
--- Drop profiles.password (not used by Java code; auth handled via GoTrue)
+-- Drop profiles.password if it exists (auth is handled via GoTrue)
 ALTER TABLE public.profiles DROP COLUMN IF EXISTS password;
 
 -- Normalize medical_records category
@@ -69,60 +80,9 @@ CREATE POLICY "Allow update on healthbridge-files"
 ON storage.objects FOR UPDATE TO anon, authenticated
 USING (bucket_id = 'healthbridge-files');
 
--- 4. LINK RAHUL'S USER_ID & SEED PROFILE
-UPDATE auth.users
-SET email_confirmed_at = NOW()
-WHERE email = 'rahul@healthbridge.com' AND email_confirmed_at IS NULL;
-
-INSERT INTO public.profiles (
-    id, user_id, full_name, email, age, gender, blood_group,
-    height_cm, weight_kg, allergies, emergency_contact_name, emergency_contact_phone
-) VALUES (
-    1,
-    (SELECT id FROM auth.users WHERE email = 'rahul@healthbridge.com' LIMIT 1),
-    'Rahul Sharma',
-    'rahul@healthbridge.com',
-    24,
-    'Male',
-    'O+',
-    172.00,
-    68.50,
-    'Penicillin',
-    'Amit Sharma',
-    '9000000001'
-)
-ON CONFLICT (id) DO UPDATE SET
-    user_id = COALESCE((SELECT id FROM auth.users WHERE email = 'rahul@healthbridge.com' LIMIT 1), profiles.user_id),
-    full_name = EXCLUDED.full_name,
-    email = EXCLUDED.email,
-    age = EXCLUDED.age,
-    gender = EXCLUDED.gender,
-    blood_group = EXCLUDED.blood_group,
-    height_cm = EXCLUDED.height_cm,
-    weight_kg = EXCLUDED.weight_kg,
-    allergies = EXCLUDED.allergies,
-    emergency_contact_name = EXCLUDED.emergency_contact_name,
-    emergency_contact_phone = EXCLUDED.emergency_contact_phone;
-
-SELECT setval('public.profiles_id_seq', COALESCE((SELECT MAX(id) FROM public.profiles), 1));
-
--- 5. SEED MEDICATIONS WITH REAL VALUES
-DELETE FROM public.medications WHERE profile_id = 1;
-
-INSERT INTO public.medications (profile_id, name, dosage, frequency, start_date, status) VALUES
-(1, 'Vitamin D3', '60,000 IU', 'Once weekly', '2026-01-15', 'Active'),
-(1, 'Cetirizine', '10 mg', 'As needed', '2026-02-01', 'Active'),
-(1, 'Paracetamol', '650 mg', 'SOS', '2026-03-10', 'Completed');
-
-SELECT setval('public.medications_id_seq', COALESCE((SELECT MAX(id) FROM public.medications), 1));
-
--- 6. SEED MEDICAL HISTORY
-DELETE FROM public.medical_history WHERE profile_id = 1;
-
-INSERT INTO public.medical_history (profile_id, condition, notes, diagnosed_on) VALUES
-(1, 'Seasonal allergic rhinitis', 'Fictional demo entry: pollen trigger', '2024-03-10'),
-(1, 'Mild Asthmatic Bronchitis', 'Triggered by dust, resolved with inhaler', '2022-11-05'),
-(1, 'Appendectomy', 'Laparoscopic surgery, fully recovered', '2019-07-20');
-
-SELECT setval('public.medical_history_id_seq', COALESCE((SELECT MAX(id) FROM public.medical_history), 1));
-
+-- 4. SYNC AUTO-INCREMENT SEQUENCES
+-- Safely guarantees sequence values are always >= 1 and will never trigger out-of-bounds error
+SELECT setval('public.profiles_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM public.profiles WHERE id > 0), 1), 1));
+SELECT setval('public.medications_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM public.medications WHERE id > 0), 1), 1));
+SELECT setval('public.medical_history_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM public.medical_history WHERE id > 0), 1), 1));
+SELECT setval('public.medical_records_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM public.medical_records WHERE id > 0), 1), 1));

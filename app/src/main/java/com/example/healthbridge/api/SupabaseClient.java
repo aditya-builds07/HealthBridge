@@ -6,6 +6,7 @@ import com.example.healthbridge.BuildConfig;
 import com.example.healthbridge.utils.SessionManager;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -90,6 +91,9 @@ public class SupabaseClient {
             };
 
             okHttpClient = new OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(30, TimeUnit.SECONDS)
                     .addInterceptor(authInterceptor)
                     .addInterceptor(logging)
                     .build();

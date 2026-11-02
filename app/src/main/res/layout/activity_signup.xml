@@ -4,130 +4,206 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/hb_card_solid">
+    android:background="@drawable/bg_gradient">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp">
+        android:gravity="center_horizontal"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="32dp">
 
-        <!-- App / Screen Title -->
+        <!-- Logo Circle: teal circle with white medical cross icon -->
+        <FrameLayout
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/bg_login_logo_circle"
+            android:layout_marginBottom="12dp"
+            android:contentDescription="@string/login_logo_description">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="✚"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                android:textColor="@color/hb_text_on_dark"
+                android:importantForAccessibility="no" />
+        </FrameLayout>
+
+        <!-- Screen Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/signup_title"
             android:textSize="26sp"
             android:textStyle="bold"
-            android:textColor="@color/hb_teal_primary"
-            android:layout_marginBottom="6dp" />
+            android:textColor="@color/hb_text_on_dark"
+            android:layout_marginBottom="4dp" />
 
+        <!-- Subtitle -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/signup_subtitle"
             android:textSize="13sp"
-            android:textColor="@color/hb_text_secondary"
+            android:textColor="@color/hb_text_on_dark"
+            android:alpha="0.8"
             android:gravity="center"
-            android:layout_marginBottom="32dp" />
+            android:layout_marginBottom="24dp" />
 
-        <!-- Full Name Input -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/layoutFullName"
+        <!-- Glass Card containing signup form -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            android:hint="@string/hint_full_name"
-            app:errorEnabled="true">
+            android:orientation="vertical"
+            android:background="@drawable/bg_glass_card"
+            android:padding="24dp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editFullName"
+            <!-- Full Name Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutFullName"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName|textCapWords" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginBottom="12dp"
+                android:hint="@string/hint_full_name"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxBackgroundColor="@android:color/white"
+                app:boxStrokeColor="@color/hb_teal_primary"
+                app:hintTextColor="@color/hb_teal_primary"
+                app:errorEnabled="true">
 
-        <!-- Email Input -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/layoutEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            android:hint="@string/hint_email"
-            app:errorEnabled="true">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editFullName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName|textCapWords"
+                    android:textColor="@color/hb_text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editEmail"
+            <!-- Email Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutEmail"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginBottom="12dp"
+                android:hint="@string/hint_email"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxBackgroundColor="@android:color/white"
+                app:boxStrokeColor="@color/hb_teal_primary"
+                app:hintTextColor="@color/hb_teal_primary"
+                app:errorEnabled="true">
 
-        <!-- Password Input -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/layoutPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            android:hint="@string/hint_password"
-            app:passwordToggleEnabled="true"
-            app:errorEnabled="true">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/hb_text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editPassword"
+            <!-- Password Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutPassword"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginBottom="12dp"
+                android:hint="@string/hint_password"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxBackgroundColor="@android:color/white"
+                app:boxStrokeColor="@color/hb_teal_primary"
+                app:hintTextColor="@color/hb_teal_primary"
+                app:endIconMode="password_toggle"
+                app:errorEnabled="true">
 
-        <!-- Confirm Password Input -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/layoutConfirmPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:hint="@string/hint_confirm_password"
-            app:passwordToggleEnabled="true"
-            app:errorEnabled="true">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textColor="@color/hb_text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editConfirmPassword"
+            <!-- Confirm Password Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutConfirmPassword"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginBottom="20dp"
+                android:hint="@string/hint_confirm_password"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxBackgroundColor="@android:color/white"
+                app:boxStrokeColor="@color/hb_teal_primary"
+                app:hintTextColor="@color/hb_teal_primary"
+                app:endIconMode="password_toggle"
+                app:errorEnabled="true">
 
-        <!-- Create Account Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSignUp"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="@string/btn_create_account"
-            android:textSize="16sp"
-            android:backgroundTint="@color/hb_teal_primary" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textColor="@color/hb_text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Progress -->
+            <!-- Create Account Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSignUp"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="@string/btn_create_account"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                app:cornerRadius="16dp"
+                app:backgroundTint="@color/hb_teal_primary" />
+
+            <!-- Back to Login Link -->
+            <TextView
+                android:id="@+id/textBackToLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:minHeight="48dp"
+                android:gravity="center"
+                android:text="@string/link_back_to_login"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/hb_teal_primary"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
+        <!-- Loading Progress Indicator -->
         <ProgressBar
             android:id="@+id/progressSignUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:visibility="gone" />
-
-        <!-- Back to Login Link -->
-        <TextView
-            android:id="@+id/textBackToLogin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="@string/link_back_to_login"
-            android:textSize="14sp"
-            android:textColor="@color/hb_teal_primary"
-            android:clickable="true"
-            android:focusable="true" />
+            android:indeterminateTint="@color/hb_text_on_dark"
+            android:visibility="gone" />
 
     </LinearLayout>
 
 </ScrollView>
-

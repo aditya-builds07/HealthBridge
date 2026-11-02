@@ -83,7 +83,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:contentDescription="Open details"
-        android:src="@android:drawable/ic_media_next"
-        app:tint="@color/hb_text_secondary" />
+        android:src="@drawable/ic_chevron_right"
+        android:tint="@color/hb_teal_primary" />
 
 </LinearLayout>

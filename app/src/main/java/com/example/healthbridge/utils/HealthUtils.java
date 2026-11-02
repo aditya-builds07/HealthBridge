@@ -120,6 +120,11 @@ public final class HealthUtils {
      * @return color resource id
      */
     @ColorRes
+    public static int getBmiColor(String category) {
+        return getBmiColorRes(category);
+    }
+
+    @ColorRes
     public static int getBmiColorRes(String category) {
         if (category == null) {
             return R.color.hb_bmi_na;

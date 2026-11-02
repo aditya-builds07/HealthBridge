@@ -67,6 +67,29 @@
                 android:minHeight="48dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Frequency Input (Required per PRD P3) -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:hint="@string/hint_medication_frequency"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxStrokeColor="@color/hb_teal_primary"
+            app:hintTextColor="@color/hb_teal_primary">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editMedicationFrequency"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences"
+                android:textColor="@color/hb_text_primary"
+                android:minHeight="48dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Start Date Input -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -90,29 +113,25 @@
                 android:minHeight="48dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Status Input -->
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
+        <!-- Status Label and Spinner -->
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="@string/hint_medication_status"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxStrokeColor="@color/hb_teal_primary"
-            app:hintTextColor="@color/hb_teal_primary">
+            android:text="@string/hint_medication_status"
+            android:textColor="@color/hb_teal_primary"
+            android:textSize="12sp"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="4dp" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editMedicationStatus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                android:textColor="@color/hb_text_primary"
-                android:text="Active"
-                android:minHeight="48dp" />
-        </com.google.android.material.textfield.TextInputLayout>
+        <Spinner
+            android:id="@+id/spinnerMedicationStatus"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_glass_card"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:spinnerMode="dropdown" />
 
         <!-- Loading Progress -->
         <ProgressBar
@@ -153,4 +172,3 @@
     </LinearLayout>
 
 </ScrollView>
-

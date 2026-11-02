@@ -85,7 +85,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
                     android:textColor="@color/hb_text_primary"
-                    android:text="rahul@healthbridge.com" />
+                     />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Password Input: rounded 16dp, white fill, toggle visibility -->
@@ -110,7 +110,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
                     android:textColor="@color/hb_text_primary"
-                    android:text="123456" />
+                     />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Login Button: full-width, teal, pill-shaped -->
@@ -123,6 +123,22 @@
                 android:textAllCaps="false"
                 app:cornerRadius="16dp"
                 app:backgroundTint="@color/hb_teal_primary" />
+
+            <!-- Sign Up Navigation Link -->
+            <TextView
+                android:id="@+id/textSignUp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:minHeight="48dp"
+                android:gravity="center"
+                android:text="@string/link_create_account"
+                android:textColor="@color/hb_teal_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true" />
 
         </LinearLayout>
 
