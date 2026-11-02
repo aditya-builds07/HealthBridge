@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common Dialog Actions -->
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <!-- Add Medication Dialog Strings -->
+    <string name="dialog_title_add_medication">Add Medication</string>
+    <string name="hint_medication_name">Medication Name</string>
+    <string name="hint_medication_dosage">Dosage (e.g. 500mg)</string>
+    <string name="hint_medication_start_date">Start Date (YYYY-MM-DD)</string>
+    <string name="hint_medication_status">Status (e.g. Active)</string>
+    <string name="error_medication_name_required">Please enter medication name</string>
+    <string name="error_medication_dosage_required">Please enter dosage</string>
+    <string name="error_medication_start_date_required">Please enter start date</string>
+    <string name="error_medication_status_required">Please enter status</string>
+    <string name="success_medication_added">Medication added successfully</string>
+    <string name="error_medication_add_failed">Failed to save medication. Please try again.</string>
+
+    <!-- Add Medical History Dialog Strings -->
+    <string name="dialog_title_add_medical_history">Add Medical History</string>
+    <string name="hint_history_condition">Condition (e.g. Hypertension)</string>
+    <string name="hint_history_date">Diagnosis Date (YYYY-MM-DD)</string>
+    <string name="hint_history_notes">Notes (e.g. Diagnosed during annual checkup)</string>
+    <string name="error_history_condition_required">Please enter medical condition</string>
+    <string name="error_history_date_required">Please enter diagnosis date</string>
+    <string name="error_history_notes_required">Please enter notes</string>
+    <string name="success_history_added">Medical history added successfully</string>
+    <string name="error_history_add_failed">Failed to save medical history. Please try again.</string>
+</resources>
