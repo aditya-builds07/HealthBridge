@@ -29,6 +29,7 @@ import com.example.healthbridge.utils.SessionManager;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -307,6 +308,10 @@ public class DashboardActivity extends BaseProtectedActivity {
      * @param onSuccess callback executed on UI thread after successful upload
      */
     private void ensureSummaryUploaded(View triggeringView, Runnable onSuccess) {
+        ensureSummaryUploaded(triggeringView, onSuccess, null);
+    }
+
+    private void ensureSummaryUploaded(View triggeringView, Runnable onSuccess, Runnable onFailure) {
         if (currentProfile == null) {
             showPlainSnackbar(getString(R.string.error_create_summary));
             return;
@@ -327,13 +332,8 @@ public class DashboardActivity extends BaseProtectedActivity {
             public void onResponse(Call<List<Medication>> call, Response<List<Medication>> medResponse) {
                 if (isFinishing() || isDestroyed()) return;
 
-                if (!medResponse.isSuccessful() || medResponse.body() == null) {
-                    resetActionState(triggeringView);
-                    showPlainSnackbar(getString(R.string.error_create_summary));
-                    return;
-                }
-
-                List<Medication> medications = medResponse.body();
+                List<Medication> medications = (medResponse.isSuccessful() && medResponse.body() != null)
+                        ? medResponse.body() : new ArrayList<>();
 
                 // Step 2: Fetch medical history asynchronously via Retrofit
                 apiService.getMedicalHistory("*", profileIdFilter).enqueue(new Callback<List<MedicalHistory>>() {
@@ -341,74 +341,16 @@ public class DashboardActivity extends BaseProtectedActivity {
                     public void onResponse(Call<List<MedicalHistory>> call, Response<List<MedicalHistory>> histResponse) {
                         if (isFinishing() || isDestroyed()) return;
 
-                        if (!histResponse.isSuccessful() || histResponse.body() == null) {
-                            resetActionState(triggeringView);
-                            showPlainSnackbar(getString(R.string.error_create_summary));
-                            return;
-                        }
+                        List<MedicalHistory> history = (histResponse.isSuccessful() && histResponse.body() != null)
+                                ? histResponse.body() : new ArrayList<>();
 
-                        List<MedicalHistory> history = histResponse.body();
-
-                        // Step 3: Generate Doctor Summary PDF on background thread
-                        if (executorService == null || executorService.isShutdown()) {
-                            executorService = Executors.newSingleThreadExecutor();
-                        }
-
-                        executorService.execute(() -> {
-                            File pdfFile = null;
-                            try {
-                                pdfFile = HealthBridgePdfGenerator.generate(DashboardActivity.this, currentProfile, medications, history);
-                            } catch (Exception ignored) {
-                                pdfFile = null;
-                            }
-
-                            final File generatedFile = pdfFile;
-                            mainHandler.post(() -> {
-                                if (isFinishing() || isDestroyed()) return;
-
-                                if (generatedFile == null || !generatedFile.exists()) {
-                                    resetActionState(triggeringView);
-                                    showPlainSnackbar(getString(R.string.error_create_summary));
-                                    return;
-                                }
-
-                                // Step 4: Upload PDF to Supabase storage bucket
-                                String uploadUrl = SupabaseClient.STORAGE_URL + SupabaseClient.BUCKET_NAME + "/doctor_summary_" + currentProfile.getId() + ".pdf";
-                                RequestBody requestBody = RequestBody.create(MediaType.parse("application/pdf"), generatedFile);
-
-                                apiService.uploadFile(uploadUrl, "application/pdf", requestBody).enqueue(new Callback<Void>() {
-                                    @Override
-                                    public void onResponse(Call<Void> call, Response<Void> response) {
-                                        if (isFinishing() || isDestroyed()) return;
-
-                                        resetActionState(triggeringView);
-
-                                        if (response.isSuccessful()) {
-                                            showPlainSnackbar(getString(R.string.success_summary_created));
-                                            if (onSuccess != null) {
-                                                onSuccess.run();
-                                            }
-                                        } else {
-                                            showPlainSnackbar(getString(R.string.error_create_summary));
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Void> call, Throwable t) {
-                                        if (isFinishing() || isDestroyed()) return;
-                                        resetActionState(triggeringView);
-                                        showPlainSnackbar(getString(R.string.error_create_summary));
-                                    }
-                                });
-                            });
-                        });
+                        generateAndUploadPdf(triggeringView, medications, history, onSuccess, onFailure);
                     }
 
                     @Override
                     public void onFailure(Call<List<MedicalHistory>> call, Throwable t) {
                         if (isFinishing() || isDestroyed()) return;
-                        resetActionState(triggeringView);
-                        showPlainSnackbar(getString(R.string.error_create_summary));
+                        generateAndUploadPdf(triggeringView, medications, new ArrayList<>(), onSuccess, onFailure);
                     }
                 });
             }
@@ -416,9 +358,91 @@ public class DashboardActivity extends BaseProtectedActivity {
             @Override
             public void onFailure(Call<List<Medication>> call, Throwable t) {
                 if (isFinishing() || isDestroyed()) return;
-                resetActionState(triggeringView);
-                showPlainSnackbar(getString(R.string.error_create_summary));
+
+                apiService.getMedicalHistory("*", profileIdFilter).enqueue(new Callback<List<MedicalHistory>>() {
+                    @Override
+                    public void onResponse(Call<List<MedicalHistory>> call, Response<List<MedicalHistory>> histResponse) {
+                        if (isFinishing() || isDestroyed()) return;
+
+                        List<MedicalHistory> history = (histResponse.isSuccessful() && histResponse.body() != null)
+                                ? histResponse.body() : new ArrayList<>();
+
+                        generateAndUploadPdf(triggeringView, new ArrayList<>(), history, onSuccess, onFailure);
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<MedicalHistory>> call, Throwable t) {
+                        if (isFinishing() || isDestroyed()) return;
+                        generateAndUploadPdf(triggeringView, new ArrayList<>(), new ArrayList<>(), onSuccess, onFailure);
+                    }
+                });
             }
+        });
+    }
+
+    private void generateAndUploadPdf(View triggeringView, List<Medication> medications, List<MedicalHistory> history, Runnable onSuccess, Runnable onFailure) {
+        if (executorService == null || executorService.isShutdown()) {
+            executorService = Executors.newSingleThreadExecutor();
+        }
+
+        executorService.execute(() -> {
+            File pdfFile = null;
+            try {
+                pdfFile = HealthBridgePdfGenerator.generate(DashboardActivity.this, currentProfile, medications, history);
+            } catch (Exception ignored) {
+                pdfFile = null;
+            }
+
+            final File generatedFile = pdfFile;
+            mainHandler.post(() -> {
+                if (isFinishing() || isDestroyed()) return;
+
+                if (generatedFile == null || !generatedFile.exists()) {
+                    resetActionState(triggeringView);
+                    showPlainSnackbar(getString(R.string.error_create_summary));
+                    if (onFailure != null) {
+                        onFailure.run();
+                    }
+                    return;
+                }
+
+                // Step 4: Upload PDF to Supabase storage bucket
+                String uploadUrl = SupabaseClient.STORAGE_URL + SupabaseClient.BUCKET_NAME + "/doctor_summary_" + currentProfile.getId() + ".pdf";
+                RequestBody requestBody = RequestBody.create(MediaType.parse("application/pdf"), generatedFile);
+
+                SupabaseClient.getApiService().uploadFile(uploadUrl, "application/pdf", requestBody).enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (isFinishing() || isDestroyed()) return;
+
+                        resetActionState(triggeringView);
+
+                        if (response.isSuccessful()) {
+                            showPlainSnackbar(getString(R.string.success_summary_created));
+                            if (onSuccess != null) {
+                                onSuccess.run();
+                            }
+                        } else {
+                            if (onFailure != null) {
+                                onFailure.run();
+                            } else {
+                                showPlainSnackbar(getString(R.string.error_create_summary));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        if (isFinishing() || isDestroyed()) return;
+                        resetActionState(triggeringView);
+                        if (onFailure != null) {
+                            onFailure.run();
+                        } else {
+                            showPlainSnackbar(getString(R.string.error_create_summary));
+                        }
+                    }
+                });
+            });
         });
     }
 
@@ -438,10 +462,20 @@ public class DashboardActivity extends BaseProtectedActivity {
      * Opens the public Doctor Summary PDF URL with ACTION_VIEW inside try/catch.
      */
     private void openDoctorSummaryPdf(int profileId) {
+        String publicPdfUrl = SupabaseClient.STORAGE_PUBLIC_URL + SupabaseClient.BUCKET_NAME + "/doctor_summary_" + profileId + ".pdf";
         try {
-            String publicPdfUrl = SupabaseClient.STORAGE_PUBLIC_URL + SupabaseClient.BUCKET_NAME + "/doctor_summary_" + profileId + ".pdf";
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(publicPdfUrl));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            try {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(publicPdfUrl));
+                browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+                browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(browserIntent);
+            } catch (Exception ex) {
+                showPlainSnackbar("PDF ready: " + publicPdfUrl);
+            }
         } catch (Exception e) {
             showPlainSnackbar(getString(R.string.error_create_summary));
         }
@@ -449,6 +483,8 @@ public class DashboardActivity extends BaseProtectedActivity {
 
     /**
      * QR Code click handler: ensures summary is generated and uploaded first, then shows the QR dialog.
+     * Mode A (online): QR encodes cloud PDF URL.
+     * Mode B (offline/fallback): QR encodes plain-text emergency card details.
      */
     private void handleQrCode() {
         if (currentProfile == null) {
@@ -456,19 +492,27 @@ public class DashboardActivity extends BaseProtectedActivity {
             return;
         }
 
-        ensureSummaryUploaded(btnQrCode, () -> {
-            try {
-                String pdfPublicUrl = SupabaseClient.STORAGE_PUBLIC_URL + SupabaseClient.BUCKET_NAME + "/doctor_summary_" + currentProfile.getId() + ".pdf";
-                QrCodeHelper.showQrDialog(DashboardActivity.this, pdfPublicUrl, getString(R.string.qr_dialog_title));
-            } catch (Exception e) {
-                showPlainSnackbar(getString(R.string.error_qr));
+        ensureSummaryUploaded(
+            btnQrCode,
+            () -> {
+                try {
+                    String pdfPublicUrl = SupabaseClient.STORAGE_PUBLIC_URL + SupabaseClient.BUCKET_NAME + "/doctor_summary_" + currentProfile.getId() + ".pdf";
+                    QrCodeHelper.showQrDialog(DashboardActivity.this, pdfPublicUrl, getString(R.string.qr_dialog_title));
+                } catch (Exception e) {
+                    showPlainSnackbar(getString(R.string.error_qr));
+                }
+            },
+            () -> {
+                try {
+                    String emergencyText = QrCodeHelper.buildEmergencyText(currentProfile);
+                    QrCodeHelper.showQrDialog(DashboardActivity.this, emergencyText, "Emergency Medical Card");
+                } catch (Exception e) {
+                    showPlainSnackbar(getString(R.string.error_qr));
+                }
             }
-        });
+        );
     }
 
-    /**
-     * Navigates to VaultActivity.
-     */
     private void handleOpenVault() {
         Intent intent = new Intent(DashboardActivity.this, VaultActivity.class);
         startActivity(intent);

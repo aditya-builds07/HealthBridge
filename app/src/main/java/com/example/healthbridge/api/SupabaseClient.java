@@ -61,9 +61,17 @@ public class SupabaseClient {
                 public Response intercept(Chain chain) throws IOException {
                     Request original = chain.request();
                     Request.Builder builder = original.newBuilder()
-                            .header("apikey", SUPABASE_KEY)
-                            .header("Content-Type", "application/json")
-                            .header("Prefer", "return=representation");
+                            .header("apikey", SUPABASE_KEY);
+
+                    // Only set default Content-Type to application/json if none is specified by the request
+                    if (original.header("Content-Type") == null) {
+                        builder.header("Content-Type", "application/json");
+                    }
+
+                    // Only set Prefer to return=representation for REST API calls (not storage)
+                    if (original.header("Prefer") == null && !original.url().encodedPath().contains("/storage/")) {
+                        builder.header("Prefer", "return=representation");
+                    }
 
                     // If a user is logged in, attach their user JWT access token.
                     // Otherwise, attach the default publishable/anon key.
