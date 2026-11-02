@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Sign Up Screen -->
+    <string name="signup_title">Create Account</string>
+    <string name="signup_subtitle">Join Health Bridge to secure your medical records</string>
+    <string name="hint_full_name">Full Name</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="btn_create_account">Create Account</string>
+    <string name="link_back_to_login">Already have an account? Sign in</string>
+    <string name="link_create_account">Don\'t have an account? Create account</string>
+
+    <!-- Field Validation Errors -->
+    <string name="signup_error_name_empty">Please enter your full name</string>
+    <string name="signup_error_email_empty">Please enter your email</string>
+    <string name="signup_error_email_invalid">Please enter a valid email address</string>
+    <string name="signup_error_password_length">Password must be at least 6 characters</string>
+    <string name="signup_error_password_mismatch">Passwords do not match</string>
+
+    <!-- Feedback & Server Errors -->
+    <string name="signup_email_exists">This email is already registered.</string>
+    <string name="signup_email_confirmation">Account created. Check your email to confirm, then log in.</string>
+    <string name="signup_success">Account created successfully</string>
+    <string name="signup_failed">Sign-up failed. Please try again.</string>
+</resources>
+
